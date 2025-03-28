@@ -8,4 +8,3 @@ Clone the LazyVim Starter Template:
 
 ```
 git clone https://github.com/LazyVim/starter ~/.config/nvim
-
