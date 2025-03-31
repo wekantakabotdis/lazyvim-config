@@ -1,7 +1,8 @@
 -- bootstrap lazy.nvim, LazyVim and your plugins
 
 require("config.lazy")
-vim.keymap.set({ "n" }, "<leader>ci", ":split term://ipython<Enter>", { desc = "[c]ode repl [i]python" })
+vim.keymap.set({ "n" }, "<localleader>ci", ":split term://ipython<Enter>", { desc = "new ipython terminal" })
+vim.keymap.set({ "n" }, "<localleader>cr", ":split term://R<Enter>", { desc = "new R terminal" })
 
 local runner = require("quarto.runner")
 vim.keymap.set("n", "<localleader>rc", runner.run_cell, { desc = "run cell", silent = true })
