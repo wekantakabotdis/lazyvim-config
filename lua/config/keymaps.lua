@@ -48,3 +48,10 @@ vim.keymap.set("v", "<localleader>r", runner.run_range, { desc = "run visual ran
 vim.keymap.set("n", "<localleader>RA", function()
   runner.run_all(true)
 end, { desc = "run all cells of all languages", silent = true })
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = "*.rmd",
+  callback = function()
+    vim.bo.filetype = "quarto"
+  end,
+})
