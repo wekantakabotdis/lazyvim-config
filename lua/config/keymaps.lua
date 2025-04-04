@@ -55,3 +55,19 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     vim.bo.filetype = "quarto"
   end,
 })
+vim.keymap.set("n", "<localleader>lr", ":Leet run<CR>", { desc = "run tests", silent = true })
+vim.keymap.set("n", "<localleader>ls", ":Leet submit<CR>", { desc = "submit", silent = true })
+vim.keymap.set("n", "<localleader>lc", ":Leet reset<CR>", { desc = "clear", silent = true })
+vim.keymap.set(
+  "n",
+  "<localleader>l,",
+  ":Leet last_submit<CR>",
+  { desc = "retrieve last submitted code", silent = true }
+)
+vim.keymap.set("n", "<localleader>ld", ":Leet desc<CR>", { desc = "toggle description", silent = true })
+vim.keymap.set("n", "<localleader>ll", ":Leet lang<CR>", { desc = "language", silent = true })
+vim.keymap.set("n", "<localleader>lf", ":Leet list<CR>", { desc = "search question", silent = true })
+vim.keymap.set("n", "<localleader>ld", ":Leet daily<CR>", { desc = "daily question", silent = true })
+vim.keymap.set("n", "<localleader>lo", ":Leet open<CR>", { desc = "open in browser", silent = true })
+vim.keymap.set("n", "<localleader>lt", ":Leet tabs<CR>", { desc = "view tabs", silent = true })
+vim.keymap.set("n", "<localleader>li", ":Leet info<CR>", { desc = "info", silent = true })
