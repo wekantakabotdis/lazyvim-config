@@ -70,3 +70,4 @@ vim.keymap.set("n", "<localleader>lf", ":Leet list<CR>", { desc = "search questi
 vim.keymap.set("n", "<localleader>lo", ":Leet open<CR>", { desc = "open in browser", silent = true })
 vim.keymap.set("n", "<localleader>lt", ":Leet tabs<CR>", { desc = "view tabs", silent = true })
 vim.keymap.set("n", "<localleader>li", ":Leet info<CR>", { desc = "info", silent = true })
+vim.keymap.set("n", "<localleader>lb", ":Leet<CR>", { desc = "begin", silent = true })
