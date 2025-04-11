@@ -71,3 +71,30 @@ vim.keymap.set("n", "<localleader>co", ":Leet open<CR>", { desc = "open in brows
 vim.keymap.set("n", "<localleader>ct", ":Leet tabs<CR>", { desc = "view tabs", silent = true })
 vim.keymap.set("n", "<localleader>ci", ":Leet info<CR>", { desc = "info", silent = true })
 vim.keymap.set("n", "<localleader>cb", ":Leet<CR>", { desc = "begin", silent = true })
+
+vim.keymap.set("n", "<leader>mm", function()
+  local input_file = vim.fn.expand("%:p")
+  local output_file = vim.fn.expand("%:r") .. ".pdf"
+  local cmd = string.format(":!pandoc '%s' -t beamer -o '%s'<CR>", input_file, output_file)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(cmd, true, false, true), "n", false)
+end, {
+  noremap = true,
+  silent = true,
+  desc = "Convert current file to Beamer PDF using Pandoc",
+})
+
+vim.keymap.set("n", "<leader>im", function()
+  local lines = {
+    "---",
+    "title: ",
+    "author: Yining Chen",
+    "theme: Copenhagen",
+    "---",
+    "",
+  }
+  vim.api.nvim_put(lines, "l", true, true)
+end, {
+  noremap = true,
+  silent = true,
+  desc = "Insert Pandoc metadata header",
+})
