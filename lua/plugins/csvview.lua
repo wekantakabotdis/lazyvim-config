@@ -1,17 +1,8 @@
 return {
   "hat0uma/csvview.nvim",
-  ft = { "csv", "tsv" },
+  ---@module "csvview"
+  ---@type CsvView.Options
   opts = {
-    keymaps = {
-      -- Text objects for selecting fields
-      textobject_field_inner = { "if", mode = { "o", "x" } },
-      textobject_field_outer = { "af", mode = { "o", "x" } },
-      -- Excel-like navigation:
-      jump_next_field_end = { "<Tab>", mode = { "n", "v" } },
-      jump_prev_field_end = { "<S-Tab>", mode = { "n", "v" } },
-      jump_next_row = { "<Enter>", mode = { "n", "v" } },
-      jump_prev_row = { "<S-Enter>", mode = { "n", "v" } },
-    },
     parser = {
       --- The number of lines that the asynchronous parser processes per cycle.
       --- This setting is used to prevent monopolization of the main thread when displaying large files.
@@ -84,7 +75,7 @@ return {
       --- If this is set, the line is treated as a header. and used for sticky header feature.
       --- see also: `view.sticky_header`
       --- @type integer|false
-      header_lnum = false,
+      header_lnum = 1,
 
       --- The sticky header feature settings
       --- If `view.header_lnum` is set, the header line is displayed at the top of the window.
@@ -123,21 +114,28 @@ return {
     ---   { "<leader>h", function() print("hello") end, mode = "n" },
     --- }
     --- ```
-    --- @type CsvView.Options.Keymaps
-    --- Actions for keymaps.
-    ---@type CsvView.Options.Actions
-    actions = {
-      -- See lua/csvview/config.lua
+
+    actions = {},
+    keymaps = {
+      -- Text objects for selecting fields
+      textobject_field_inner = { "if", mode = { "o", "x" } },
+      textobject_field_outer = { "af", mode = { "o", "x" } },
+      -- Excel-like navigation:
+      -- Use <Tab> and <S-Tab> to move horizontally between fields.
+      -- Use <Enter> and <S-Enter> to move vertically between rows and place the cursor at the end of the field.
+      -- Note: In terminals, you may need to enable CSI-u mode to use <S-Tab> and <S-Enter>.
+      jump_next_field_end = { "<Tab>", mode = { "n", "v" } },
+      jump_prev_field_end = { "<S-Tab>", mode = { "n", "v" } },
+      jump_next_row = { "<Enter>", mode = { "n", "v" } },
+      jump_prev_row = { "<S-Enter>", mode = { "n", "v" } },
     },
-  },
-  config = function(_, opts)
-    require("csvview").setup(opts)
-    -- Automatically enable csvview when opening CSV/TSV files
-    vim.api.nvim_create_autocmd("FileType", {
-      pattern = { "csv", "tsv" },
+
+    vim.api.nvim_create_autocmd("BufRead", {
+      pattern = { "*.csv", "*.tsv" },
       callback = function()
-        require("csvview").enable()
+        vim.cmd("CsvViewEnable")
       end,
-    })
-  end,
+    }),
+  },
+  cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle" },
 }

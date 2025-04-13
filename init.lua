@@ -8,7 +8,3 @@ require("nvim-treesitter.configs").setup({
     disable = { "latex" }, -- Disable Tree-sitter highlighting for LaTeX files
   },
 })
-
-require("render-markdown").setup({
-  completions = { lsp = { enabled = true } },
-})

@@ -16,8 +16,6 @@ vim.keymap.set(
   { noremap = true, silent = true, desc = "Insert Python Code" }
 )
 
-vim.keymap.set("n", "<leader>qp", ":QuartoPreview<Enter>", { noremap = true, silent = true, desc = "Quarto Preview" })
-
 -- Disable default mappings from vim-tmux-navigator so we can set our own
 vim.g.tmux_navigator_no_mappings = 1
 
@@ -98,3 +96,16 @@ end, {
   silent = true,
   desc = "Insert Pandoc metadata header",
 })
+
+vim.keymap.set("n", "<leader>p", function()
+  local ft = vim.bo.filetype
+  if ft == "csv" or ft == "tsv" then
+    vim.cmd("CsvViewToggle")
+  elseif ft == "markdown" then
+    vim.cmd("PeekOpen")
+  elseif ft == "quarto" or ft == "rmarkdown" then
+    vim.cmd("QuartoPreview")
+  else
+    print("No preview command mapped for filetype: " .. ft)
+  end
+end, { silent = true })
