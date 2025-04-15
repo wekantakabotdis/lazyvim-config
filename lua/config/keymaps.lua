@@ -34,8 +34,8 @@ vim.keymap.set("t", "<C-k>", "<C-\\><C-n>:TmuxNavigateUp<CR>", { silent = true }
 vim.keymap.set("t", "<C-l>", "<C-\\><C-n>:TmuxNavigateRight<CR>", { silent = true })
 vim.keymap.set("t", "<C-\\>", "<C-\\><C-n>:TmuxNavigatePrevious<CR>", { silent = true })
 
-vim.keymap.set({ "n" }, "<localleader>ci", ":split term://ipython<Enter>", { desc = "new ipython terminal" })
-vim.keymap.set({ "n" }, "<localleader>cr", ":split term://R<Enter>", { desc = "new R terminal" })
+vim.keymap.set({ "n" }, "<localleader>ti", ":split term://ipython<Enter>", { desc = "new ipython terminal" })
+vim.keymap.set({ "n" }, "<localleader>tr", ":split term://R<Enter>", { desc = "new R terminal" })
 
 local runner = require("quarto.runner")
 vim.keymap.set("n", "<localleader>rc", runner.run_cell, { desc = "run cell", silent = true })
