@@ -109,3 +109,5 @@ vim.keymap.set("n", "<leader>p", function()
     print("No preview command mapped for filetype: " .. ft)
   end
 end, { silent = true })
+
+vim.keymap.set("n", "<leader>e", "<CMD>Oil<CR>", { desc = "Open parent directory" })
