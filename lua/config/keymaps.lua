@@ -103,6 +103,8 @@ vim.keymap.set("n", "<leader>p", function()
     vim.cmd("CsvViewToggle")
   elseif ft == "markdown" then
     vim.cmd("PeekOpen")
+  elseif ft == "typst" then
+    vim.cmd("TypstPreviewToggle")
   elseif ft == "quarto" or ft == "rmarkdown" then
     vim.cmd("QuartoPreview")
   else
