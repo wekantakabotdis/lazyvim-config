@@ -1,18 +1,19 @@
 return {
   "stevearc/oil.nvim",
+  lazy = false,
+  dependencies = {
+    { "echasnovski/mini.icons", opts = {} },
+  },
   opts = {
     keymaps = {
-      ["<C-h>"] = false, -- Disable Ctrl+h
+      ["<C-h>"] = false,
     },
+    delete_to_trash = true,
+    skip_confirm_for_simple_edits = true,
   },
-  config = function()
-    require("oil").setup({
-      keymaps = {
-        ["<C-h>"] = false, -- Disable Ctrl+h
-      },
-    })
+  config = function(_, opts)
+    require("oil").setup(opts)
 
-    -- Automatically open preview on Oil buffer enter
     vim.api.nvim_create_autocmd("User", {
       pattern = "OilEnter",
       callback = function(args)
@@ -23,8 +24,4 @@ return {
       end,
     })
   end,
-  dependencies = {
-    { "echasnovski/mini.icons", opts = {} },
-  },
-  lazy = false,
 }
