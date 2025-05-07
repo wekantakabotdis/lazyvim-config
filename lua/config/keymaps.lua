@@ -113,3 +113,10 @@ vim.keymap.set("n", "<leader>p", function()
 end, { silent = true })
 
 vim.keymap.set("n", "<leader>e", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
+function insertFullPath()
+  local filepath = vim.fn.expand("%")
+  vim.fn.setreg("+", filepath) -- write to clippoard
+end
+
+vim.keymap.set("n", "<leader>cp", insertFullPath, { noremap = true, silent = true, desc = "Copy path" })
