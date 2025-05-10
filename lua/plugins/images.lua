@@ -1,15 +1,21 @@
 return {
   "3rd/image.nvim",
+  -- only load in Kitty (avoids headless/unsupported-terminal errors)
+  cond = function()
+    return vim.env.TERM == "xterm-kitty"
+  end,
   opts = {
+    -- choose the Kitty graphics protocol backend
     backend = "kitty",
-    processor = "magick_cli", -- or "magick_cli"
+    -- ImageMagick CLI processor
+    processor = "magick_cli",
     integrations = {
       markdown = {
         enabled = true,
         clear_in_insert_mode = false,
         download_remote_images = true,
         only_render_image_at_cursor = false,
-        filetypes = { "markdown", "vimwiki" }, -- markdown extensions (ie. quarto) can go here
+        filetypes = { "markdown", "vimwiki" },
       },
     },
     tmux_show_only_in_active_window = true,
