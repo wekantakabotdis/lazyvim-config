@@ -11,6 +11,14 @@ if vim.g.neovide then
   vim.keymap.set("c", "<D-v>", "<C-R>+") -- Paste command mode
   vim.keymap.set("i", "<D-v>", '<ESC>l"+Pli') -- Paste insert mode
   vim.g.neovide_remember_window_size = true
+  vim.g.neovide_scroll_animation_length = 0 -- disable smooth scrolling :contentReference[oaicite:6]{index=6}
+  vim.g.neovide_scroll_animation_far_lines = 0 -- if scrolling >1 screen, don’t animate :contentReference[oaicite:7]{index=7}
+  vim.g.neovide_cursor_animation_length = 0
+  vim.g.neovide_cursor_short_animation_length = 0
+  vim.g.neovide_cursor_trail_size = 0
+  vim.g.neovide_cursor_antialiasing = false
+  vim.g.neovide_cursor_animate_in_insert_mode = true
+  vim.g.neovide_cursor_animate_command_line = false
 end
 
 -- Allow clipboard copy paste in neovim
