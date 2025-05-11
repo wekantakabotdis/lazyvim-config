@@ -120,3 +120,24 @@ function insertFullPath()
 end
 
 vim.keymap.set("n", "<leader>cp", insertFullPath, { noremap = true, silent = true, desc = "Copy path" })
+
+-- Harpoon keymaps (sane defaults)
+local mark = require("harpoon.mark") -- Harpoon mark module :contentReference[oaicite:0]{index=0}
+local ui = require("harpoon.ui") -- Harpoon UI module :contentReference[oaicite:1]{index=1}
+
+-- Add the current file to Harpoon’s list
+vim.keymap.set("n", "<leader>a", mark.add_file, { desc = "󰈙 Add file to Harpoon list" }) -- José Garcia’s recommended default :contentReference[oaicite:2]{index=2}
+
+-- Jump to Harpoon file slots #1–#9 with <leader>1…9
+for i = 1, 9 do
+  vim.keymap.set("n", "<leader>" .. i, function()
+    ui.nav_file(i)
+  end, { desc = string.format("󱈙 Go to Harpoon file #%d", i) })
+end
+-- (Optional) Use <leader>o as an alternative toggle key
+vim.keymap.set("n", "<leader>o", ui.toggle_quick_menu, { desc = "󰄬 Toggle Harpoon quick-menu" }) -- mirrors <C-e> for consistency :contentReference[oaicite:8]{index=8}
+
+-- (Optional) If you use Telescope, integrate Harpoon marks there
+vim.keymap.set("n", "<leader>hm", function()
+  require("telescope").extensions.harpoon.marks()
+end, { noremap = true, desc = "󰈙 Telescope: Harpoon marks" }) -- Telescope extension from Harpoon :contentReference[oaicite:9]{index=9}
