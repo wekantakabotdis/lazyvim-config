@@ -112,7 +112,11 @@ vim.keymap.set("n", "<leader>p", function()
   end
 end, { silent = true })
 
-vim.keymap.set("n", "<leader>e", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+-- Set up the oil mapping after snacks explorer is disabled
+-- This ensures that <leader>e always opens oil instead of snacks explorer
+vim.keymap.set("n", "<leader>e", function()
+  require("oil").open()
+end, { desc = "Open parent directory (Oil)", silent = true, noremap = true })
 
 function insertFullPath()
   local filepath = vim.fn.expand("%")

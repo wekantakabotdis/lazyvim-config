@@ -3,6 +3,10 @@
 -- Add any additional options here
 vim.g.snacks_animate = false
 
+-- Reduce timeout to make key sequences more responsive
+vim.opt.timeoutlen = 300  -- Time in milliseconds to wait for a mapped sequence
+vim.opt.ttimeoutlen = 0   -- Time to wait for a key code sequence (0 means no timeout)
+
 if vim.g.neovide then
   vim.keymap.set("n", "<D-s>", ":w<CR>") -- Save
   vim.keymap.set("v", "<D-c>", '"+y') -- Copy
