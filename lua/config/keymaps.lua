@@ -145,3 +145,10 @@ vim.keymap.set("n", "<leader>o", ui.toggle_quick_menu, { desc = "󰄬 Toggle Har
 vim.keymap.set("n", "<leader>hm", function()
   require("telescope").extensions.harpoon.marks()
 end, { noremap = true, desc = "󰈙 Telescope: Harpoon marks" }) -- Telescope extension from Harpoon :contentReference[oaicite:9]{index=9}
+
+-- Disable auto-formatting command
+vim.keymap.set("n", "<leader>uf", function()
+  vim.g.autoformat = false
+  vim.b.autoformat = false
+  vim.notify("Auto-formatting disabled", vim.log.levels.INFO, { title = "Format" })
+end, { desc = "Disable auto-formatting" })
