@@ -13,6 +13,9 @@ return {
   },
   config = function(_, opts)
     require("oil").setup(opts)
+    vim.keymap.set("n", "<leader>e", function()
+      require("oil").open()
+    end, { desc = "Open parent directory (Oil)", silent = true, noremap = true })
 
     vim.api.nvim_create_autocmd("User", {
       pattern = "OilEnter",

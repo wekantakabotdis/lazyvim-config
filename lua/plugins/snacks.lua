@@ -2,6 +2,9 @@ return {
   -- Snacks.nvim configuration to disable explorer functionality completely
   -- This will prevent snacks from setting up its file explorer mapping (leader e)
   "folke/snacks.nvim",
+  keys = {
+    { "<leader>e", false },
+  },
 
   opts = {
     -- Disable specific snacks features that might conflict with oil
