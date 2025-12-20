@@ -146,3 +146,6 @@ vim.keymap.set("n", "<leader>uf", function()
   vim.b.autoformat = false
   vim.notify("Auto-formatting disabled", vim.log.levels.INFO, { title = "Format" })
 end, { desc = "Disable auto-formatting" })
+
+-- Paste over visual selection without overwriting register
+vim.keymap.set("x", "p", [["_dP]])
