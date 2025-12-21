@@ -8,13 +8,18 @@ return {
   config = function()
     ---@type opencode.Opts
     vim.g.opencode_opts = {
-      -- Default configuration - see :h opencode.config for more options
+      provider = {
+        enabled = "tmux",
+        tmux = {
+          window_name = "opencode",
+          direction = "horizontal",
+          size = "30%",
+        },
+      },
     }
 
-    -- Required for opts.events.reload.
     vim.o.autoread = true
 
-    -- Recommended/example keymaps.
     vim.keymap.set({ "n", "x" }, "<C-a>", function()
       require("opencode").ask("@this: ", { submit = true })
     end, { desc = "Ask opencode" })
@@ -22,6 +27,42 @@ return {
     vim.keymap.set({ "n", "x" }, "<C-x>", function()
       require("opencode").select()
     end, { desc = "Execute opencode action…" })
+
+    vim.keymap.set({ "n", "x" }, "<leader>ai", function()
+      require("opencode").prompt("implement", { submit = true })
+    end, { desc = "AI: Implement" })
+
+    vim.keymap.set({ "n", "x" }, "<leader>ar", function()
+      require("opencode").prompt("review", { submit = true })
+    end, { desc = "AI: Review" })
+
+    vim.keymap.set({ "n", "x" }, "<leader>af", function()
+      require("opencode").prompt("fix", { submit = true })
+    end, { desc = "AI: Fix diagnostics" })
+
+    vim.keymap.set({ "n", "x" }, "<leader>ad", function()
+      require("opencode").prompt("document", { submit = true })
+    end, { desc = "AI: Document" })
+
+    vim.keymap.set({ "n", "x" }, "<leader>ae", function()
+      require("opencode").prompt("explain", { submit = true })
+    end, { desc = "AI: Explain" })
+
+    vim.keymap.set({ "n", "x" }, "<leader>at", function()
+      require("opencode").prompt("test", { submit = true })
+    end, { desc = "AI: Add tests" })
+
+    vim.keymap.set({ "n", "x" }, "<leader>ao", function()
+      require("opencode").prompt("optimize", { submit = true })
+    end, { desc = "AI: Optimize" })
+
+    vim.keymap.set({ "n", "x" }, "<leader>ax", function()
+      require("opencode").prompt("diagnostics", { submit = true })
+    end, { desc = "AI: Explain diagnostics" })
+
+    vim.keymap.set({ "n", "x" }, "<leader>ag", function()
+      require("opencode").prompt("diff", { submit = true })
+    end, { desc = "AI: Review git diff" })
 
     vim.keymap.set({ "n", "t" }, "<C-.>", function()
       require("opencode").toggle()
