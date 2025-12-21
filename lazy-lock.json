@@ -34,8 +34,6 @@
   "nvim-treesitter": { "branch": "main", "commit": "8cdffc6d334731ce3703b6d870a5a34fd878208a" },
   "nvim-treesitter-textobjects": { "branch": "main", "commit": "e91c585ac0ee760198dabc1fad2e6227effdcd5e" },
   "nvim-ts-autotag": { "branch": "main", "commit": "c4ca798ab95b316a768d51eaaaee48f64a4a46bc" },
-  "nvim-web-devicons": { "branch": "master", "commit": "6788013bb9cb784e606ada44206b0e755e4323d7" },
-  "oil.nvim": { "branch": "master", "commit": "3b249b71957ee35d5adbfb21f77992809a4c4683" },
   "opencode.nvim": { "branch": "main", "commit": "86020e9033f0087993e505a2b2df9a798bec2a07" },
   "otter.nvim": { "branch": "main", "commit": "b36e1a40617e35779d2097fc9b9fd701acd4f5e8" },
   "peek.nvim": { "branch": "master", "commit": "5820d937d5414baea5f586dc2a3d912a74636e5b" },
@@ -53,5 +51,6 @@
   "vim-slime": { "branch": "main", "commit": "3fb77a9d1d3dd3abfbdbd4840eb20947f39f688b" },
   "vim-tmux-navigator": { "branch": "master", "commit": "c45243dc1f32ac6bcf6068e5300f3b2b237e576a" },
   "vimtex": { "branch": "master", "commit": "c6e2162066db4ceb44774f9bfb79fe97a4c25e71" },
-  "which-key.nvim": { "branch": "main", "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a" }
+  "which-key.nvim": { "branch": "main", "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a" },
+  "yazi.nvim": { "branch": "main", "commit": "0754bf5cee9a0c64d5755d685d1d9d4c18c75fcc" }
 }
