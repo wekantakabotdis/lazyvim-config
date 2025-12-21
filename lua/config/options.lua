@@ -3,6 +3,10 @@
 -- Add any additional options here
 vim.g.snacks_animate = false
 
+-- Disable netrw (use yazi instead)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- Disable auto-formatting globally
 vim.g.autoformat = false
 
