@@ -51,3 +51,10 @@ require("lazy").setup({
     },
   },
 })
+
+-- Ensure nvim-treesitter runtime queries are available early
+-- (fixes highlighting when nvim is opened directly with a file via yazi/terminal)
+local ts_runtime = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/runtime"
+if vim.fn.isdirectory(ts_runtime) == 1 then
+  vim.opt.rtp:append(ts_runtime)
+end
