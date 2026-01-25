@@ -14,8 +14,8 @@ return {
     },
   },
 
-  { -- directly open ipynb files as quarto docuements
-    -- and convert back behind the scenes
+  { -- directly open ipynb files as quarto documents
+    -- Converts .ipynb (JSON) to readable text format for editing
     "GCBallesteros/jupytext.nvim",
     opts = {
       custom_language_formatting = {
@@ -122,21 +122,41 @@ return {
 
   {
     "benlubas/molten-nvim",
-    enabled = false,
+    enabled = true,
     build = ":UpdateRemotePlugins",
+    dependencies = {
+      "3rd/image.nvim",
+    },
     init = function()
+      -- Output display settings
       vim.g.molten_image_provider = "image.nvim"
       vim.g.molten_output_win_max_height = 20
       vim.g.molten_auto_open_output = false
+      vim.g.molten_wrap_output = true
+      vim.g.molten_virt_text_output = true
+      vim.g.molten_virt_lines_off_by_1 = true
+
+      -- Enter output window when it opens
+      vim.g.molten_enter_output_behavior = "open_and_enter"
+
+      -- Use borderless floating window for output
+      vim.g.molten_output_show_more = true
     end,
     keys = {
+      { "<leader>ji", ":MoltenInit<cr>", desc = "Jupyter: [i]nit kernel" },
+      { "<leader>jo", ":MoltenEvaluateOperator<cr>", desc = "Jupyter: evaluate [o]perator" },
+      { "<leader>jl", ":MoltenEvaluateLine<cr>", desc = "Jupyter: evaluate [l]ine" },
+      { "<leader>jr", ":MoltenReevaluateCell<cr>", desc = "Jupyter: [r]e-evaluate cell" },
+      { "<leader>jv", ":<C-u>MoltenEvaluateVisual<cr>", mode = "v", desc = "Jupyter: evaluate [v]isual" },
+      { "<leader>jd", ":MoltenDelete<cr>", desc = "Jupyter: [d]elete cell" },
+      { "<leader>jh", ":MoltenHideOutput<cr>", desc = "Jupyter: [h]ide output" },
+      { "<leader>js", ":MoltenShowOutput<cr>", desc = "Jupyter: [s]how output" },
+      { "<leader>jx", ":MoltenInterrupt<cr>", desc = "Jupyter: interrupt (e[x]it)" },
+      { "<leader>jR", ":MoltenRestart!<cr>", desc = "Jupyter: [R]estart kernel" },
+
+      -- Legacy mappings for backward compatibility
       { "<leader>mi", ":MoltenInit<cr>", desc = "[m]olten [i]nit" },
-      {
-        "<leader>mv",
-        ":<C-u>MoltenEvaluateVisual<cr>",
-        mode = "v",
-        desc = "molten eval visual",
-      },
+      { "<leader>mv", ":<C-u>MoltenEvaluateVisual<cr>", mode = "v", desc = "molten eval visual" },
       { "<leader>mr", ":MoltenReevaluateCell<cr>", desc = "molten re-eval cell" },
     },
   },
