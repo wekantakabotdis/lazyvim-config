@@ -1,5 +1,5 @@
 return {
-  "al-kot/typst-preview.nvim",
+  "wekantakabotdis/typst-preview.nvim",
   ft = { "typst" },
   opts = {},
   config = function(_, opts)
