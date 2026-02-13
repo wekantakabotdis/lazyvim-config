@@ -2,19 +2,20 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
-vim.keymap.set(
-  "n",
-  "<leader>ir",
-  "i```{r}<Esc>o<Enter>```<Esc>ki",
-  { noremap = true, silent = true, desc = "Insert R Code" }
-)
+local function insert_fenced_code_block(lang)
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  vim.api.nvim_buf_set_lines(0, row, row, false, { "```{" .. lang .. "}", "", "```" })
+  vim.api.nvim_win_set_cursor(0, { row + 2, 0 })
+  vim.cmd("startinsert")
+end
 
-vim.keymap.set(
-  "n",
-  "<leader>ip",
-  "i```{python}<Esc>o<Enter>```<Esc>ki",
-  { noremap = true, silent = true, desc = "Insert Python Code" }
-)
+vim.keymap.set("n", "<leader>ir", function()
+  insert_fenced_code_block("r")
+end, { noremap = true, silent = true, desc = "Insert R Code" })
+
+vim.keymap.set("n", "<leader>ip", function()
+  insert_fenced_code_block("python")
+end, { noremap = true, silent = true, desc = "Insert Python Code" })
 
 -- Disable default mappings from vim-tmux-navigator so we can set our own
 vim.g.tmux_navigator_no_mappings = 1
