@@ -41,7 +41,21 @@ return {
       max_width_window_percentage = math.huge,
       window_overlap_clear_enabled = true,
       window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "" },
+      editor_only_render_when_focused = true,
+      tmux_show_only_in_active_window = true,
     },
+    config = function(_, opts)
+      local image = require("image")
+      image.setup(opts)
+
+      local group = vim.api.nvim_create_augroup("ImageNvimTmuxCleanup", { clear = true })
+      vim.api.nvim_create_autocmd({ "ExitPre", "VimLeavePre" }, {
+        group = group,
+        callback = function()
+          pcall(image.clear)
+        end,
+      })
+    end,
   },
 
   {
