@@ -1,88 +1,120 @@
 return {
-
-  { -- requires plugins in lua/plugins/treesitter.lua and lua/plugins/lsp.lua
-    -- for complete functionality (language features)
+  {
     "quarto-dev/quarto-nvim",
     ft = { "quarto" },
     dev = false,
-    opts = {},
-    dependencies = {
-      -- for language features in code cells
-      -- configured in lua/plugins/lsp.lua and
-      -- added as a nvim-cmp source in lua/plugins/completion.lua
-      "jmbuhr/otter.nvim",
-    },
-  },
-
-  { -- directly open ipynb files as quarto documents
-    -- Converts .ipynb (JSON) to readable text format for editing
-    "GCBallesteros/jupytext.nvim",
     opts = {
-      custom_language_formatting = {
-        python = {
-          extension = "qmd",
-          style = "quarto",
-          force_ft = "quarto",
-        },
-        r = {
-          extension = "qmd",
-          style = "quarto",
-          force_ft = "quarto",
-        },
+      codeRunner = {
+        enabled = true,
+        default_method = "molten",
       },
     },
+    dependencies = {
+      "jmbuhr/otter.nvim",
+      "benlubas/molten-nvim",
+    },
+    config = function(_, opts)
+      require("quarto").setup(opts)
+      local runner = require("quarto.runner")
+      local quarto = require("quarto")
+
+      local function ensure_runner_ready()
+        pcall(quarto.activate)
+      end
+
+      local function ensure_molten_initialized()
+        local ok, status = pcall(require, "molten.status")
+        if ok and status.initialized() ~= "Molten" then
+          pcall(vim.cmd, "MoltenInit")
+        end
+      end
+
+      local function apply_molten_output_mode()
+        pcall(vim.fn.MoltenUpdateOption, "auto_open_output", false)
+        pcall(vim.fn.MoltenUpdateOption, "output_win_hide_on_leave", false)
+        pcall(vim.fn.MoltenUpdateOption, "cover_empty_lines", true)
+        pcall(vim.fn.MoltenUpdateOption, "virt_text_output", true)
+        pcall(vim.fn.MoltenUpdateOption, "output_virt_lines", true)
+        pcall(vim.fn.MoltenUpdateOption, "virt_lines_off_by_1", false)
+        pcall(vim.fn.MoltenUpdateOption, "image_location", "virt")
+      end
+
+      local function move_chunk(direction)
+        local bufnr = vim.api.nvim_get_current_buf()
+        local cur_line = vim.api.nvim_win_get_cursor(0)[1]
+        local last_line = vim.api.nvim_buf_line_count(bufnr)
+        local matcher = vim.regex("^\\s*```\\s*{")
+
+        local current_header = nil
+        for line_no = cur_line, 1, -1 do
+          local line = vim.api.nvim_buf_get_lines(bufnr, line_no - 1, line_no, false)[1] or ""
+          if matcher:match_str(line) then
+            current_header = line_no
+            break
+          end
+        end
+
+        if direction == "next" then
+          local start_line = current_header and (current_header + 1) or (cur_line + 1)
+          for line_no = start_line, last_line do
+            local line = vim.api.nvim_buf_get_lines(bufnr, line_no - 1, line_no, false)[1] or ""
+            if matcher:match_str(line) then
+              vim.api.nvim_win_set_cursor(0, { math.min(line_no + 1, last_line), 0 })
+              return
+            end
+          end
+        else
+          local start_line = current_header and (current_header - 1) or (cur_line - 1)
+          for line_no = start_line, 1, -1 do
+            local line = vim.api.nvim_buf_get_lines(bufnr, line_no - 1, line_no, false)[1] or ""
+            if matcher:match_str(line) then
+              vim.api.nvim_win_set_cursor(0, { math.min(line_no + 1, last_line), 0 })
+              return
+            end
+          end
+        end
+      end
+
+      vim.keymap.set("n", "<leader>jn", function() move_chunk("next") end, { desc = "Notebook: [n]ext cell" })
+      vim.keymap.set("n", "<leader>jp", function() move_chunk("prev") end, { desc = "Notebook: [p]revious cell" })
+      vim.keymap.set("n", "<leader>jc", function()
+        ensure_runner_ready()
+        ensure_molten_initialized()
+        apply_molten_output_mode()
+        runner.run_cell()
+      end, { desc = "Notebook: run [c]ell", silent = true })
+      vim.keymap.set("n", "<leader>jC", function()
+        ensure_runner_ready()
+        ensure_molten_initialized()
+        apply_molten_output_mode()
+        runner.run_cell()
+        move_chunk("next")
+      end, { desc = "Notebook: run cell and move", silent = true })
+      vim.keymap.set("n", "<leader>ja", function()
+        ensure_runner_ready()
+        ensure_molten_initialized()
+        apply_molten_output_mode()
+        runner.run_all(true)
+      end, { desc = "Notebook: run [a]ll cells", silent = true })
+      vim.keymap.set("n", "<leader>jl", function()
+        ensure_runner_ready()
+        ensure_molten_initialized()
+        apply_molten_output_mode()
+        runner.run_line()
+      end, { desc = "Notebook: run [l]ine", silent = true })
+      vim.keymap.set("v", "<leader>jv", function()
+        ensure_runner_ready()
+        ensure_molten_initialized()
+        apply_molten_output_mode()
+        runner.run_range()
+      end, { desc = "Notebook: run [v]isual selection", silent = true })
+      vim.keymap.set("n", "<leader>ji", "<cmd>MoltenInit<cr>", { desc = "Notebook: kernel [i]nit", silent = true })
+      vim.keymap.set("n", "<leader>js", "<cmd>MoltenShowOutput<cr>", { desc = "Notebook: [s]how output", silent = true })
+      vim.keymap.set("n", "<leader>jh", "<cmd>MoltenHideOutput<cr>", { desc = "Notebook: [h]ide output", silent = true })
+    end,
   },
 
-  { -- send code from python/r/qmd documets to a terminal or REPL
-    -- like ipython, R, bash
-    "jpalardy/vim-slime",
-    dev = false,
-    init = function()
-      vim.b["quarto_is_python_chunk"] = false
-      Quarto_is_in_python_chunk = function()
-        require("otter.tools.functions").is_otter_language_context("python")
-      end
-
-      vim.cmd([[
-      let g:slime_dispatch_ipython_pause = 100
-      function SlimeOverride_EscapeText_quarto(text)
-      call v:lua.Quarto_is_in_python_chunk()
-      if exists('g:slime_python_ipython') && len(split(a:text,"\n")) > 1 && b:quarto_is_python_chunk && !(exists('b:quarto_is_r_mode') && b:quarto_is_r_mode)
-      return ["%cpaste -q\n", g:slime_dispatch_ipython_pause, a:text, "--", "\n"]
-      else
-      if exists('b:quarto_is_r_mode') && b:quarto_is_r_mode && b:quarto_is_python_chunk
-      return [a:text, "\n"]
-      else
-      return [a:text]
-      end
-      end
-      endfunction
-      ]])
-
-      vim.g.slime_target = "neovim"
-      vim.g.slime_no_mappings = true
-      vim.g.slime_python_ipython = 1
-    end,
-    config = function()
-      vim.g.slime_input_pid = false
-      vim.g.slime_suggest_default = true
-      vim.g.slime_menu_config = false
-      vim.g.slime_neovim_ignore_unlisted = true
-
-      local function mark_terminal()
-        local job_id = vim.b.terminal_job_id
-        vim.print("job_id: " .. job_id)
-      end
-
-      local function set_terminal()
-        vim.fn.call("slime#config", {})
-      end
-      vim.keymap.set("n", "<leader>cm", mark_terminal, { desc = "[m]ark terminal" })
-      vim.keymap.set("n", "<leader>cs", set_terminal, { desc = "[s]et terminal" })
-    end,
-  },
-
-  { -- paste an image from the clipboard or drag-and-drop
+  {
     "HakonHarnes/img-clip.nvim",
     event = "BufEnter",
     ft = { "markdown", "quarto", "latex" },
@@ -113,51 +145,10 @@ return {
     end,
   },
 
-  { -- preview equations
+  {
     "jbyuki/nabla.nvim",
     keys = {
       { "<leader>qm", ':lua require"nabla".toggle_virt()<cr>', desc = "toggle [m]ath equations" },
-    },
-  },
-
-  {
-    "benlubas/molten-nvim",
-    enabled = true,
-    build = ":UpdateRemotePlugins",
-    dependencies = {
-      "3rd/image.nvim",
-    },
-    init = function()
-      -- Output display settings
-      vim.g.molten_image_provider = "image.nvim"
-      vim.g.molten_output_win_max_height = 20
-      vim.g.molten_auto_open_output = false
-      vim.g.molten_wrap_output = true
-      vim.g.molten_virt_text_output = true
-      vim.g.molten_virt_lines_off_by_1 = true
-
-      -- Enter output window when it opens
-      vim.g.molten_enter_output_behavior = "open_and_enter"
-
-      -- Use borderless floating window for output
-      vim.g.molten_output_show_more = true
-    end,
-    keys = {
-      { "<leader>ji", ":MoltenInit<cr>", desc = "Jupyter: [i]nit kernel" },
-      { "<leader>jo", ":MoltenEvaluateOperator<cr>", desc = "Jupyter: evaluate [o]perator" },
-      { "<leader>jl", ":MoltenEvaluateLine<cr>", desc = "Jupyter: evaluate [l]ine" },
-      { "<leader>jr", ":MoltenReevaluateCell<cr>", desc = "Jupyter: [r]e-evaluate cell" },
-      { "<leader>jv", ":<C-u>MoltenEvaluateVisual<cr>", mode = "v", desc = "Jupyter: evaluate [v]isual" },
-      { "<leader>jd", ":MoltenDelete<cr>", desc = "Jupyter: [d]elete cell" },
-      { "<leader>jh", ":MoltenHideOutput<cr>", desc = "Jupyter: [h]ide output" },
-      { "<leader>js", ":MoltenShowOutput<cr>", desc = "Jupyter: [s]how output" },
-      { "<leader>jx", ":MoltenInterrupt<cr>", desc = "Jupyter: interrupt (e[x]it)" },
-      { "<leader>jR", ":MoltenRestart!<cr>", desc = "Jupyter: [R]estart kernel" },
-
-      -- Legacy mappings for backward compatibility
-      { "<leader>mi", ":MoltenInit<cr>", desc = "[m]olten [i]nit" },
-      { "<leader>mv", ":<C-u>MoltenEvaluateVisual<cr>", mode = "v", desc = "molten eval visual" },
-      { "<leader>mr", ":MoltenReevaluateCell<cr>", desc = "molten re-eval cell" },
     },
   },
 }
