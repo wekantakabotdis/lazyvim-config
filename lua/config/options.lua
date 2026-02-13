@@ -14,6 +14,11 @@ vim.g.autoformat = false
 vim.opt.timeoutlen = 300  -- Time in milliseconds to wait for a mapped sequence
 vim.opt.ttimeoutlen = 0   -- Time to wait for a key code sequence (0 means no timeout)
 
+-- Visually wrap long lines without modifying file contents.
+vim.opt.wrap = true
+vim.opt.linebreak = true
+vim.opt.breakindent = true
+
 if vim.g.neovide then
   vim.keymap.set("n", "<D-s>", ":w<CR>") -- Save
   vim.keymap.set("v", "<D-c>", '"+y') -- Copy
