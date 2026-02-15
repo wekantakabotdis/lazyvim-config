@@ -35,6 +35,16 @@ return {
 
     -- Auto-show docs and use bordered popups for clarity
     completion = {
+      trigger = {
+        -- In quarto/ipynb code chunks we want member completion on `.` immediately.
+        prefetch_on_insert = true,
+        show_on_blocked_trigger_characters = function()
+          return {}
+        end,
+        show_on_x_blocked_trigger_characters = function()
+          return {}
+        end,
+      },
       menu = {
         auto_show = true,
         border = "rounded",
@@ -47,7 +57,8 @@ return {
         },
       },
       documentation = {
-        auto_show = true,
+        -- Keep completion instant in notebook chunks; open docs manually when needed.
+        auto_show = false,
         window = { border = "rounded" },
       },
     },
@@ -57,7 +68,25 @@ return {
     -- Default list of enabled providers defined so that you can extend it
     -- elsewhere in your config, without redefining it, due to `opts_extend`
     sources = {
-      default = { "lsp", "path", "snippets", "buffer" },
+      per_filetype = {
+        quarto = { "lsp" },
+        ipynb = { "lsp" },
+      },
+      providers = {
+        lsp = {
+          async = function(ctx)
+            local ft = vim.bo[ctx.bufnr].filetype
+            return ft == "quarto" or ft == "ipynb"
+          end,
+          timeout_ms = function(ctx)
+            local ft = vim.bo[ctx.bufnr].filetype
+            if ft == "quarto" or ft == "ipynb" then
+              return 180
+            end
+            return 500
+          end,
+        },
+      },
     },
 
     -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
@@ -102,5 +131,4 @@ return {
       },
     },
   },
-  opts_extend = { "sources.default" },
 }

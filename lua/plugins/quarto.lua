@@ -1,25 +1,96 @@
 return {
   {
     "quarto-dev/quarto-nvim",
-    ft = { "quarto" },
+    ft = { "quarto", "ipynb" },
     dev = false,
     opts = {
+      lspFeatures = {
+        enabled = true,
+        chunks = "curly",
+        languages = { "python", "r", "julia", "bash", "html" },
+        diagnostics = {
+          enabled = true,
+          triggers = { "BufWritePost" },
+        },
+        completion = {
+          enabled = true,
+        },
+      },
       codeRunner = {
         enabled = true,
         default_method = "molten",
       },
     },
     dependencies = {
-      "jmbuhr/otter.nvim",
+      {
+        "jmbuhr/otter.nvim",
+        opts = {
+          buffers = {
+            preambles = {
+              python = {
+                "import numpy as np",
+                "import pandas as pd",
+                "import matplotlib.pyplot as plt",
+              },
+            },
+          },
+        },
+      },
       "benlubas/molten-nvim",
     },
     config = function(_, opts)
       require("quarto").setup(opts)
       local runner = require("quarto.runner")
       local quarto = require("quarto")
+      local otter = require("otter")
+
+      local function ensure_lsp_loaded()
+        local ok_lazy, lazy = pcall(require, "lazy")
+        if ok_lazy then
+          pcall(lazy.load, {
+            plugins = {
+              "nvim-lspconfig",
+              "mason.nvim",
+              "mason-lspconfig.nvim",
+            },
+          })
+        end
+        pcall(require, "lspconfig")
+      end
 
       local function ensure_runner_ready()
+        ensure_lsp_loaded()
         pcall(quarto.activate)
+      end
+
+      local function is_notebook_buffer(bufnr)
+        local name = vim.api.nvim_buf_get_name(bufnr)
+        return name:match("%.ipynb$") ~= nil or name:match("%.qmd$") ~= nil
+      end
+
+      local function schedule_notebook_activation(bufnr)
+        if not vim.api.nvim_buf_is_valid(bufnr) or vim.b[bufnr].quarto_activate_pending then
+          return
+        end
+
+        vim.b[bufnr].quarto_activate_pending = true
+        vim.defer_fn(function()
+          if not vim.api.nvim_buf_is_valid(bufnr) then
+            return
+          end
+
+          vim.b[bufnr].quarto_activate_pending = false
+          local ft = vim.bo[bufnr].filetype
+          if ft == "quarto" or ft == "ipynb" then
+            ensure_lsp_loaded()
+            pcall(quarto.activate)
+            return
+          end
+          if ft == "markdown" and is_notebook_buffer(bufnr) then
+            ensure_lsp_loaded()
+            pcall(otter.activate, { "python" }, true, true)
+          end
+        end, 120)
       end
 
       local function ensure_molten_initialized()
@@ -73,6 +144,23 @@ return {
             end
           end
         end
+      end
+
+      local activate_group = vim.api.nvim_create_augroup("NotebookOtterActivate", { clear = true })
+      vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "InsertLeave", "BufWritePost" }, {
+        group = activate_group,
+        callback = function(args)
+          local ft = vim.bo[args.buf].filetype
+          if ft == "quarto" or ft == "ipynb" or (ft == "markdown" and is_notebook_buffer(args.buf)) then
+            schedule_notebook_activation(args.buf)
+          end
+        end,
+      })
+
+      local current_buf = vim.api.nvim_get_current_buf()
+      local current_ft = vim.bo[current_buf].filetype
+      if current_ft == "quarto" or current_ft == "ipynb" or (current_ft == "markdown" and is_notebook_buffer(current_buf)) then
+        schedule_notebook_activation(current_buf)
       end
 
       vim.keymap.set("n", "<leader>jn", function() move_chunk("next") end, { desc = "Notebook: [n]ext cell" })
