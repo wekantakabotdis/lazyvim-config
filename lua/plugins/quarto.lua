@@ -68,6 +68,16 @@ return {
         return name:match("%.ipynb$") ~= nil or name:match("%.qmd$") ~= nil
       end
 
+      local function normalize_notebook_word_motions(bufnr)
+        if not vim.api.nvim_buf_is_valid(bufnr) then
+          return
+        end
+        -- Quarto notebooks often include `.` in iskeyword; remove it so w/b stop on dots.
+        vim.api.nvim_buf_call(bufnr, function()
+          vim.opt_local.iskeyword:remove(".")
+        end)
+      end
+
       local function schedule_notebook_activation(bufnr)
         if not vim.api.nvim_buf_is_valid(bufnr) or vim.b[bufnr].quarto_activate_pending then
           return
@@ -82,11 +92,13 @@ return {
           vim.b[bufnr].quarto_activate_pending = false
           local ft = vim.bo[bufnr].filetype
           if ft == "quarto" or ft == "ipynb" then
+            normalize_notebook_word_motions(bufnr)
             ensure_lsp_loaded()
             pcall(quarto.activate)
             return
           end
           if ft == "markdown" and is_notebook_buffer(bufnr) then
+            normalize_notebook_word_motions(bufnr)
             ensure_lsp_loaded()
             pcall(otter.activate, { "python" }, true, true)
           end
@@ -152,6 +164,7 @@ return {
         callback = function(args)
           local ft = vim.bo[args.buf].filetype
           if ft == "quarto" or ft == "ipynb" or (ft == "markdown" and is_notebook_buffer(args.buf)) then
+            normalize_notebook_word_motions(args.buf)
             schedule_notebook_activation(args.buf)
           end
         end,
@@ -160,11 +173,18 @@ return {
       local current_buf = vim.api.nvim_get_current_buf()
       local current_ft = vim.bo[current_buf].filetype
       if current_ft == "quarto" or current_ft == "ipynb" or (current_ft == "markdown" and is_notebook_buffer(current_buf)) then
+        normalize_notebook_word_motions(current_buf)
         schedule_notebook_activation(current_buf)
       end
 
-      vim.keymap.set("n", "<leader>jn", function() move_chunk("next") end, { desc = "Notebook: [n]ext cell" })
-      vim.keymap.set("n", "<leader>jp", function() move_chunk("prev") end, { desc = "Notebook: [p]revious cell" })
+      vim.keymap.set("n", "<leader>jn", function()
+        move_chunk("next")
+        vim.cmd("normal! zz")
+      end, { desc = "Notebook: [n]ext cell" })
+      vim.keymap.set("n", "<leader>jp", function()
+        move_chunk("prev")
+        vim.cmd("normal! zz")
+      end, { desc = "Notebook: [p]revious cell" })
       vim.keymap.set("n", "<leader>jc", function()
         ensure_runner_ready()
         ensure_molten_initialized()
